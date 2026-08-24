@@ -1,0 +1,682 @@
+<!doctype html>
+<html lang="ro">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tech & Deals — Nucleul Ecosistemului</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <style>
+      :root {
+        --void: #060911;
+        --panel: #0d1420cc;
+        --grid: #1c2b3f;
+        --cyan: #4ff0d6;
+        --violet: #b46bff;
+        --gold: #ffb84f;
+        --text: #e6f4f1;
+        --dim: #5f7690;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        background: var(--void);
+        color: var(--text);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        overflow-x: hidden;
+      }
+
+      /* ---------- Password gate ---------- */
+      #gate {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--void);
+      }
+      #gate .box {
+        width: min(320px, 88vw);
+        background: var(--panel);
+        border: 1px solid var(--grid);
+        border-radius: 14px;
+        padding: 28px 24px;
+        text-align: center;
+        backdrop-filter: blur(6px);
+      }
+      #gate .eyebrow {
+        font-size: 9.5px;
+        letter-spacing: 0.18em;
+        color: var(--cyan);
+        font-family: ui-monospace, monospace;
+        margin-bottom: 8px;
+      }
+      #gate h2 {
+        margin: 0 0 18px;
+        font-size: 17px;
+        font-weight: 800;
+      }
+      #gate input {
+        width: 100%;
+        background: #060911;
+        border: 1px solid var(--grid);
+        color: var(--text);
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 14px;
+        margin-bottom: 12px;
+        font-family: ui-monospace, monospace;
+      }
+      #gate button {
+        width: 100%;
+        background: var(--cyan);
+        color: #04140f;
+        border: none;
+        border-radius: 8px;
+        padding: 10px;
+        font-weight: 800;
+        font-size: 13px;
+        cursor: pointer;
+      }
+      #gate .err {
+        color: var(--gold);
+        font-size: 11px;
+        margin-top: 10px;
+        min-height: 14px;
+      }
+
+      /* ---------- Dashboard ---------- */
+      #dash {
+        display: none;
+        position: relative;
+        min-height: 100vh;
+        padding: 22px 14px 40px;
+        overflow: hidden;
+      }
+      .starfield {
+        position: absolute;
+        inset: 0;
+        background-image:
+          radial-gradient(1px 1px at 20px 30px, #4ff0d633, transparent),
+          radial-gradient(1px 1px at 90px 120px, #b46bff33, transparent),
+          radial-gradient(1px 1px at 160px 60px, #ffffff22, transparent),
+          radial-gradient(1px 1px at 210px 180px, #4ff0d622, transparent),
+          radial-gradient(1px 1px at 40px 220px, #ffffff1a, transparent);
+        background-size: 240px 240px;
+        opacity: 0.8;
+      }
+      .vignette {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          ellipse at 50% 40%,
+          transparent 40%,
+          var(--void) 90%
+        );
+        pointer-events: none;
+      }
+      header {
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 8px;
+        max-width: 640px;
+        margin-inline: auto;
+      }
+      .eyebrow2 {
+        font-size: 9.5px;
+        letter-spacing: 0.18em;
+        color: var(--cyan);
+        margin-bottom: 6px;
+        font-family: ui-monospace, monospace;
+      }
+      h1 {
+        font-size: 22px;
+        margin: 0;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+      }
+      .live {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 10px;
+        color: var(--cyan);
+        font-weight: 700;
+        font-family: ui-monospace, monospace;
+      }
+      .live .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--cyan);
+        box-shadow: 0 0 10px var(--cyan);
+        animation: pulse 1.6s infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.35;
+        }
+      }
+
+      .orbitWrap {
+        position: relative;
+        max-width: 600px;
+        margin: 4px auto 8px;
+      }
+      svg {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      .telemetryRow {
+        position: relative;
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+        max-width: 640px;
+        margin-inline: auto;
+      }
+      .telCard {
+        flex: 1;
+        background: var(--panel);
+        border: 1px solid var(--grid);
+        border-radius: 10px;
+        padding: 10px 8px;
+        text-align: center;
+        backdrop-filter: blur(4px);
+      }
+      .telVal {
+        font-size: 16px;
+        font-weight: 800;
+        font-family: ui-monospace, monospace;
+      }
+      .telLbl {
+        font-size: 8px;
+        letter-spacing: 0.09em;
+        color: var(--dim);
+        margin-top: 4px;
+      }
+
+      .logPanel {
+        position: relative;
+        max-width: 640px;
+        margin: 0 auto;
+        background: var(--panel);
+        border: 1px solid var(--grid);
+        border-radius: 10px;
+        padding: 10px 12px 12px;
+        backdrop-filter: blur(4px);
+      }
+      .logHead {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 9px;
+        letter-spacing: 0.14em;
+        color: var(--dim);
+        margin-bottom: 8px;
+        font-family: ui-monospace, monospace;
+      }
+      .logHead .dot2 {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--violet);
+        box-shadow: 0 0 6px var(--violet);
+      }
+      .logLine {
+        display: flex;
+        gap: 8px;
+        font-size: 10px;
+        padding: 4px 0;
+        font-family: ui-monospace, monospace;
+        align-items: baseline;
+        border-top: 1px solid #ffffff08;
+      }
+      .logLine:first-child {
+        border-top: none;
+      }
+      .logTime {
+        color: #4a5b71;
+        flex-shrink: 0;
+      }
+      .logTag {
+        color: var(--cyan);
+        font-weight: 700;
+        flex-shrink: 0;
+        min-width: 92px;
+      }
+      .logMsg {
+        color: #c9d3de;
+        flex: 1;
+      }
+      .logPrice {
+        color: var(--gold);
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+
+      .footnote {
+        position: relative;
+        margin-top: 14px;
+        font-size: 8.5px;
+        color: #3a4658;
+        text-align: center;
+        max-width: 640px;
+        margin-inline: auto;
+      }
+      .empty {
+        text-align: center;
+        color: var(--dim);
+        font-size: 11px;
+        padding: 10px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="gate">
+      <div class="box">
+        <div class="eyebrow">TECH &amp; DEALS · ACCES RESTRICȚIONAT</div>
+        <h2>Nucleul Ecosistemului</h2>
+        <input
+          id="pw"
+          type="password"
+          placeholder="parolă"
+          autocomplete="off"
+        />
+        <button onclick="tryUnlock()">Intră</button>
+        <div class="err" id="err"></div>
+      </div>
+    </div>
+
+    <div id="dash">
+      <div class="starfield"></div>
+      <div class="vignette"></div>
+
+      <header>
+        <div>
+          <div class="eyebrow2">TECH &amp; DEALS · TELEMETRIE</div>
+          <h1>Nucleul Ecosistemului</h1>
+        </div>
+        <div class="live"><span class="dot"></span> ONLINE</div>
+      </header>
+
+      <div class="orbitWrap">
+        <svg viewBox="0 0 600 460" id="orbitSvg">
+          <defs>
+            <radialGradient id="coreGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#ffb84f" stop-opacity="0.9" />
+              <stop offset="60%" stop-color="#ffb84f" stop-opacity="0.15" />
+              <stop offset="100%" stop-color="#ffb84f" stop-opacity="0" />
+            </radialGradient>
+            <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+              <feGaussianBlur stdDeviation="3.2" result="b" />
+              <feMerge>
+                <feMergeNode in="b" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+          <circle
+            cx="300"
+            cy="300"
+            r="190"
+            fill="none"
+            stroke="#1c2b3f"
+            stroke-width="1"
+            stroke-dasharray="2 6"
+          />
+          <circle
+            cx="300"
+            cy="300"
+            r="104"
+            fill="none"
+            stroke="#1c2b3f"
+            stroke-width="1"
+            opacity="0.5"
+          />
+          <g id="spokes"></g>
+          <circle cx="300" cy="300" r="80" fill="url(#coreGlow)" />
+          <g id="particles"></g>
+          <circle
+            cx="300"
+            cy="300"
+            r="46"
+            fill="#0d1420"
+            stroke="#ffb84f"
+            stroke-width="1.5"
+            filter="url(#glow)"
+          />
+          <text
+            x="300"
+            y="294"
+            text-anchor="middle"
+            fill="#ffb84f"
+            font-size="14"
+            font-weight="800"
+            font-family="ui-sans-serif, system-ui"
+            id="postsToday"
+          >
+            –
+          </text>
+          <text
+            x="300"
+            y="312"
+            text-anchor="middle"
+            fill="#8fa3ba"
+            font-size="8"
+            letter-spacing="0.1em"
+            font-family="ui-monospace, monospace"
+          >
+            POSTĂRI AZI
+          </text>
+          <g id="nodes"></g>
+        </svg>
+      </div>
+
+      <div class="telemetryRow">
+        <div class="telCard">
+          <div class="telVal" style="color: #4ff0d6" id="telPosts">–</div>
+          <div class="telLbl">POSTĂRI TOTAL</div>
+        </div>
+        <div class="telCard">
+          <div class="telVal" style="color: #b46bff" id="telComments">–</div>
+          <div class="telLbl">COMENTARII PROCESATE</div>
+        </div>
+        <div class="telCard">
+          <div class="telVal" style="color: #ffb84f" id="telApproved">–</div>
+          <div class="telLbl">VIDEO-URI APROBATE</div>
+        </div>
+      </div>
+
+      <div class="logPanel">
+        <div class="logHead">
+          <span class="dot2"></span> ULTIMELE POSTĂRI REALE
+        </div>
+        <div id="feed"><div class="empty">se încarcă…</div></div>
+      </div>
+
+      <div class="footnote">
+        conectat live la Supabase · reîmprospătare la 20s · agenții orbitali
+        sunt reprezentare vizuală a pipeline-ului
+      </div>
+    </div>
+
+    <script>
+      /* ============ CONFIG ============ */
+      const SUPABASE_URL = "https://vrucwnhcefkbqnkhfcli.supabase.co";
+      const SUPABASE_ANON_KEY =
+        "sb_publishable_2RoVcBxLe-IIfD0ysl9SvQ_x7f64p4i";
+
+      /* Parola: schimb-o rulând în consola browserului:
+   crypto.subtle.digest("SHA-256", new TextEncoder().encode("PAROLA_TA_NOUA"))
+     .then(b => console.log([...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")))
+   și pune rezultatul mai jos. Parola implicită acum este: techdeals2026 */
+      const PASSWORD_HASH =
+        "53c59098a4260a0b5a84b350bf3985e9bddca044aa07f380a21f00bcd454c1d";
+
+      /* ============ GATE ============ */
+      async function sha256(str) {
+        const buf = await crypto.subtle.digest(
+          "SHA-256",
+          new TextEncoder().encode(str),
+        );
+        return [...new Uint8Array(buf)]
+          .map((x) => x.toString(16).padStart(2, "0"))
+          .join("");
+      }
+      async function tryUnlock() {
+        const pw = document.getElementById("pw").value;
+        const hash = await sha256(pw);
+        if (
+          hash === PASSWORD_HASH ||
+          sessionStorage.getItem("td_unlocked") === "1"
+        ) {
+          sessionStorage.setItem("td_unlocked", "1");
+          document.getElementById("gate").style.display = "none";
+          document.getElementById("dash").style.display = "block";
+          initDashboard();
+        } else {
+          document.getElementById("err").textContent = "Parolă greșită.";
+        }
+      }
+      document.getElementById("pw").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") tryUnlock();
+      });
+      if (sessionStorage.getItem("td_unlocked") === "1") tryUnlock();
+
+      /* ============ ORBIT GEOMETRY ============ */
+      const AGENTS = [
+        { code: "R-01", name: "RESEARCH" },
+        { code: "R-02", name: "PRODUCT-OFFER" },
+        { code: "R-03", name: "SCRIPT" },
+        { code: "R-04", name: "VIDEO-ASSEMBLY" },
+        { code: "R-05", name: "SAFETY-CHECK" },
+        { code: "R-06", name: "PUBLISH" },
+        { code: "R-07", name: "ENGAGEMENT" },
+        { code: "R-08", name: "AFFILIATE-PERF" },
+      ];
+      const CX = 300,
+        CY = 300,
+        R = 190;
+      function pos(i, n) {
+        const a = (i / n) * Math.PI * 2 - Math.PI / 2;
+        return { x: CX + Math.cos(a) * R, y: CY + Math.sin(a) * R };
+      }
+      const svgNS = "http://www.w3.org/2000/svg";
+      function el(tag, attrs) {
+        const e = document.createElementNS(svgNS, tag);
+        for (const k in attrs) e.setAttribute(k, attrs[k]);
+        return e;
+      }
+
+      const spokesG = document.getElementById("spokes");
+      const nodesG = document.getElementById("nodes");
+      const particlesG = document.getElementById("particles");
+      const spokeEls = [],
+        nodeEls = [];
+
+      AGENTS.forEach((a, i) => {
+        const p = pos(i, AGENTS.length);
+        const spoke = el("line", {
+          x1: CX,
+          y1: CY,
+          x2: p.x,
+          y2: p.y,
+          stroke: "#1c2b3f",
+          "stroke-width": 1,
+          opacity: 0.5,
+        });
+        spokesG.appendChild(spoke);
+        spokeEls.push(spoke);
+
+        const g = el("g", {});
+        const circle = el("circle", {
+          cx: p.x,
+          cy: p.y,
+          r: 16,
+          fill: "#0d1420",
+          stroke: "#2a3548",
+          "stroke-width": 1.2,
+        });
+        const ring = el("circle", {
+          cx: p.x,
+          cy: p.y,
+          r: 26,
+          fill: "none",
+          stroke: "#4ff0d6",
+          "stroke-width": 1,
+          opacity: 0,
+        });
+        const code = el("text", {
+          x: p.x,
+          y: p.y + 3,
+          "text-anchor": "middle",
+          fill: "#5b6a80",
+          "font-size": 8,
+          "font-weight": 700,
+          "font-family": "ui-monospace, monospace",
+        });
+        code.textContent = a.code;
+        const label = el("text", {
+          x: p.x,
+          y: p.y + (p.y > CY ? 34 : -26),
+          "text-anchor": "middle",
+          fill: "#5b6a80",
+          "font-size": 8.5,
+          "font-weight": 700,
+          "letter-spacing": "0.03em",
+          "font-family": "ui-sans-serif, system-ui",
+        });
+        label.textContent = a.name;
+        g.append(circle, ring, code, label);
+        nodesG.appendChild(g);
+        nodeEls.push({ circle, ring, code, pos: p });
+      });
+
+      let activeSet = new Set([0, 3]);
+      function renderActive() {
+        AGENTS.forEach((a, i) => {
+          const on = activeSet.has(i);
+          spokeEls[i].setAttribute("stroke", on ? "#4ff0d6" : "#1c2b3f");
+          spokeEls[i].setAttribute("stroke-width", on ? 1.4 : 1);
+          spokeEls[i].setAttribute("opacity", on ? 0.75 : 0.5);
+          nodeEls[i].circle.setAttribute("stroke", on ? "#4ff0d6" : "#2a3548");
+          nodeEls[i].circle.setAttribute("r", on ? 20 : 16);
+          nodeEls[i].circle.setAttribute("filter", on ? "url(#glow)" : "");
+          nodeEls[i].ring.setAttribute("opacity", on ? 0.4 : 0);
+          nodeEls[i].code.setAttribute("fill", on ? "#4ff0d6" : "#5b6a80");
+          nodeEls[i].label.setAttribute("fill", on ? "#e6f4f1" : "#5b6a80");
+        });
+      }
+      let particles = [];
+      let pid = 0;
+      function spawnParticle(fromIdx) {
+        pid++;
+        particles.push({
+          id: pid,
+          from: fromIdx,
+          t: 0,
+          inward: Math.random() < 0.7,
+          el: null,
+        });
+      }
+      function tickParticles() {
+        particles = particles.filter((p) => p.t < 1);
+        particles.forEach((p) => {
+          p.t += 0.045;
+          const a = pos(p.from, AGENTS.length);
+          const from = p.inward ? a : { x: CX, y: CY };
+          const to = p.inward ? { x: CX, y: CY } : a;
+          const x = from.x + (to.x - from.x) * p.t;
+          const y = from.y + (to.y - from.y) * p.t;
+          if (!p.el) {
+            p.el = el("circle", {
+              r: 3,
+              fill: "#b46bff",
+              filter: "url(#glow)",
+            });
+            particlesG.appendChild(p.el);
+          }
+          p.el.setAttribute("cx", x);
+          p.el.setAttribute("cy", y);
+        });
+        particlesG.querySelectorAll("circle").forEach((c, i) => {
+          if (i >= particles.length) c.remove();
+        });
+      }
+      setInterval(tickParticles, 40);
+      setInterval(() => {
+        const i = Math.floor(Math.random() * AGENTS.length);
+        if (Math.random() < 0.55) activeSet.add(i);
+        else activeSet.delete(i);
+        renderActive();
+        if (Math.random() < 0.6) spawnParticle(i);
+      }, 1200);
+
+      /* ============ REAL DATA (Supabase) ============ */
+      async function sbFetch(path) {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+          headers: {
+            apikey: SUPABASE_ANON_KEY,
+            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          },
+        });
+        if (!res.ok) throw new Error(`Supabase ${res.status}`);
+        return res.json();
+      }
+
+      function fmtTime(iso) {
+        const d = new Date(iso);
+        return d.toLocaleTimeString("ro-RO", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+
+      async function refreshData() {
+        try {
+          const todayStart = new Date();
+          todayStart.setHours(0, 0, 0, 0);
+          const todayISO = todayStart.toISOString();
+
+          const [postsToday, postsAll, comments, videosApproved, recentPosts] =
+            await Promise.all([
+              sbFetch(
+                `facebook_posts?select=post_id&posted_at=gte.${todayISO}`,
+              ),
+              sbFetch(`facebook_posts?select=post_id`),
+              sbFetch(`seen_comments?select=comment_id`),
+              sbFetch(`videos?select=id&safety_status=eq.APPROVED`),
+              sbFetch(
+                `facebook_posts?select=product_title,price,merchant,posted_at&order=posted_at.desc&limit=6`,
+              ),
+            ]);
+
+          document.getElementById("postsToday").textContent = postsToday.length;
+          document.getElementById("telPosts").textContent = postsAll.length;
+          document.getElementById("telComments").textContent = comments.length;
+          document.getElementById("telApproved").textContent =
+            videosApproved.length;
+
+          const feed = document.getElementById("feed");
+          if (!recentPosts.length) {
+            feed.innerHTML = '<div class="empty">nicio postare încă</div>';
+          } else {
+            feed.innerHTML = recentPosts
+              .map(
+                (p) => `
+        <div class="logLine">
+          <span class="logTime">${fmtTime(p.posted_at)}</span>
+          <span class="logTag">${(p.merchant || "").toUpperCase()}</span>
+          <span class="logMsg">${p.product_title || "produs"}</span>
+          ${p.price ? `<span class="logPrice">${p.price} RON</span>` : ""}
+        </div>
+      `,
+              )
+              .join("");
+          }
+        } catch (e) {
+          document.getElementById("feed").innerHTML =
+            `<div class="empty">eroare la încărcarea datelor: ${e.message}</div>`;
+        }
+      }
+
+      function initDashboard() {
+        renderActive();
+        refreshData();
+        setInterval(refreshData, 20000);
+      }
+    </script>
+  </body>
+</html>
